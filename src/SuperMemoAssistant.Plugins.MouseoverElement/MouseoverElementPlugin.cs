@@ -68,7 +68,7 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
     protected override void PluginInit()
     {
 
-      if (!this.RegisterProvider(Name, new List<string> { FileEx.ElementRegex }, _contentProvider))
+      if (!this.RegisterProvider(Name, new List<string> { ElementEx.ElementFileRegex, ElementEx.ElementAboutRegex }, _contentProvider))
       {
         LogTo.Error($"Failed to Register provider {Name} with MouseoverPopup Service");
         return;

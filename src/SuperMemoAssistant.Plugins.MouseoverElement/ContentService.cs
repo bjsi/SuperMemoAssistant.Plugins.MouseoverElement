@@ -17,18 +17,28 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
   public class ContentService : PerpetualMarshalByRefObject, IContentProvider
   {
 
-    public RemoteTask<PopupContent> FetchHtml(RemoteCancellationToken ct, string file)
+    public RemoteTask<PopupContent> FetchHtml(RemoteCancellationToken ct, string href)
     {
       try
       {
 
-        Regex regex = new Regex(FileEx.ElementRegex);
-        Match match = regex.Match(file);
+        Regex aboutRegex = new Regex(ElementEx.ElementAboutRegex);
+        Regex fileRegex = new Regex(ElementEx.ElementFileRegex);
 
-        if (file.IsNullOrEmpty() || !match.Success)
+        if (href.IsNullOrEmpty())
           return null;
 
-        if (int.TryParse(match.Groups[1].Value, out var id))
+        Match fileMatch = fileRegex.Match(href);
+        Match aboutMatch = aboutRegex.Match(href);
+
+        if (!(fileMatch.Success || aboutMatch.Success))
+          return null;
+
+        Match matched = fileMatch.Success
+          ? fileMatch
+          : aboutMatch;
+
+        if (int.TryParse(matched.Groups[1].Value, out var id))
           return GetElementContent(id);
 
         return null;
@@ -36,7 +46,7 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
       }
       catch (Exception ex)
       {
-        LogTo.Error($"Failed to FetchHtml for file {file} with exception {ex}");
+        LogTo.Error($"Failed to FetchHtml for {href} with exception {ex}");
         throw;
       }
     }
@@ -57,7 +67,7 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
       string text = htmlComp.Text.Value;
       string html = CreatePopupHtml(text);
 
-      return Task.FromResult(new PopupContent(new References(), html));
+      return Task.FromResult(new PopupContent(new References(), html, false, false, true, elementId));
 
     }
 
