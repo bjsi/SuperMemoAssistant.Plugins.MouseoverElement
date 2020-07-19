@@ -33,7 +33,7 @@
 
 ### Usage
 
-Hover over links to glossary terms to open them in a popup window within SuperMemo.
+Hover over links to other elements to open them in a popup window within SuperMemo.
 
 ### Configuration
 
