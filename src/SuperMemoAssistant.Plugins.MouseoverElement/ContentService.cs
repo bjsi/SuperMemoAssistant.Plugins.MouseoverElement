@@ -7,6 +7,7 @@ using SuperMemoAssistant.Sys.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,11 +15,12 @@ using System.Threading.Tasks;
 namespace SuperMemoAssistant.Plugins.MouseoverElement
 {
   [Serializable]
-  public class ContentService : PerpetualMarshalByRefObject, IContentProvider
+  public class ContentService : PerpetualMarshalByRefObject, IMouseoverContentProvider
   {
 
     public RemoteTask<PopupContent> FetchHtml(RemoteCancellationToken ct, string href)
     {
+
       try
       {
 
@@ -44,6 +46,10 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
         return null;
 
       }
+      catch (RemotingException) 
+      {
+        return null;
+      }
       catch (Exception ex)
       {
         LogTo.Error($"Failed to FetchHtml for {href} with exception {ex}");
@@ -56,18 +62,18 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
 
       var element = Svc.SM.Registry.Element[elementId];
       if (element.IsNull())
-        return null;
+        return Task.FromResult<PopupContent>(null);
 
       // element.ToString(); ??
 
       var htmlComp = element.ComponentGroup.GetFirstHtmlComponent();
       if (htmlComp.IsNull())
-        return null;
+        return Task.FromResult<PopupContent>(null);
 
       string text = htmlComp.Text.Value;
       string html = CreatePopupHtml(text);
 
-      return Task.FromResult(new PopupContent(new References(), html, false, false, true, elementId));
+      return Task.FromResult(new PopupContent(new References(), html, false, elementId));
 
     }
 

@@ -48,7 +48,6 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
 
     #endregion
 
-
     #region Properties Impl - Public
 
     /// <inheritdoc />
@@ -57,10 +56,12 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
     /// <inheritdoc />
     public override bool HasSettings => false;
 
+    /// <summary>
+    /// Content provider to be registered with MouseoverPopup Service
+    /// </summary>
     private ContentService _contentProvider => new ContentService();
 
     #endregion
-
 
     #region Methods Impl
 
@@ -68,11 +69,13 @@ namespace SuperMemoAssistant.Plugins.MouseoverElement
     protected override void PluginInit()
     {
 
-      if (!this.RegisterProvider(Name, new List<string> { ElementEx.ElementFileRegex, ElementEx.ElementAboutRegex }, _contentProvider))
+      // Register the provider with MouseoverPopup Service
+      if (!this.RegisterProvider(Name, new string[] { ElementEx.ElementFileRegex, ElementEx.ElementAboutRegex }, _contentProvider))
       {
         LogTo.Error($"Failed to Register provider {Name} with MouseoverPopup Service");
         return;
       }
+
       LogTo.Debug($"Successfully registered provider {Name} with MouseoverPopup Service");
 
     }
